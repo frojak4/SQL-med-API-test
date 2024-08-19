@@ -1,19 +1,19 @@
 const express = require('express');
-const sql = require('mssql');
+const sql = require('mssql/msnodesqlv8');
 
 const app = express();
 
 
 const config = {
-    user: '',
-    password: '',
-    server: 'localhost\\SQLEXPRESS',
+    server: 'FRODE-LAPTOP\\SQLEXPRESS',
     database: 'BOOKS',
+    driver: 'msnodesqlv8',
     options: {
         encrypt: true,
         trustServerCertificate: true,
     }
 }
+
 
 sql.connect(config, err => {
     if (err) {
@@ -28,7 +28,8 @@ app.get('/', (req, res) => {
     if (err) {
         res.status(404).send("Could not get database");
     } else {
-        res.status(200).send(result);
+        res.status(200).send(result.recordset);
+        console.log(result.recordset);
     }
 })
 
@@ -37,6 +38,7 @@ app.get('/:id', (req, res) => {
     if (err) {
         res.status(404).send(`Could not find book with id: ${req.params.id}`);
     } else {
-        res.status(200).send(result);
+        res.status(200).send(result.recordset);
+        console.log(result.recordset);
     }
 })
