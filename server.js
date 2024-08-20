@@ -1,17 +1,18 @@
 const express = require('express');
-const sql = require('mssql/msnodesqlv8');
-
+const sql = require('mssql');
+require('dotenv').config();
 const app = express();
 
 
 const config = {
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     server: 'FRODE-LAPTOP\\SQLEXPRESS',
-    database: 'BOOKS',
-    driver: 'msnodesqlv8',
+    database: 'users',
     options: {
         encrypt: true,
         trustServerCertificate: true,
-    }
+    },
 }
 
 
@@ -24,21 +25,26 @@ sql.connect(config, err => {
 })
 
 app.get('/', (req, res) => {
-    new sql.Request().query("SELECT * FROM books", (err, result))
+    new sql.Request().query("SELECT * FROM users", (err, result) => {
     if (err) {
         res.status(404).send("Could not get database");
+        console.log(err);
     } else {
         res.status(200).send(result.recordset);
         console.log(result.recordset);
     }
+})
 })
 
 app.get('/:id', (req, res) => {
-    new sql.Request().query(`SELECT * FROM books WHERE ID = ${req.params.id}`, (err, result));
+    new sql.Request().query(`SELECT * FROM users WHERE ID = ${req.params.id}`, (err, result) => {
     if (err) {
-        res.status(404).send(`Could not find book with id: ${req.params.id}`);
+        res.status(404).send(`Could not find user with id: ${req.params.id}`);
     } else {
         res.status(200).send(result.recordset);
         console.log(result.recordset);
     }
 })
+})
+
+app.listen(3002);
